@@ -2,7 +2,6 @@ package codeGym1;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
@@ -38,7 +37,6 @@ public class Main {
                     break;
                 case 4:
                     estadistica();
-
                     break;
                 case 5:
                     break;
@@ -53,8 +51,7 @@ public class Main {
         System.out.println("Cifrar archivo ");
         System.out.println("Captura la ruta del archivo en claro : Archivo.txt" );
         try {
-            String ruta;
-            ruta = Objects.requireNonNull(Main.class.getResource("Archivo.txt")).getPath();
+            String ruta = Main.class.getResource("Archivo.txt").getPath();
             FileInputStream fis = new FileInputStream(ruta);
             int valor;
             while ((valor = fis.read()) != -1){
