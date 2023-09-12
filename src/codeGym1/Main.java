@@ -31,15 +31,6 @@ public class Main {
 
             switch (opc1) {
                 case 1:
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-                    try {
-                        System.out.println("ingrese el texto ");
-                        String text = reader.readLine();
-                        System.out.println("texto ingresado: " + text);
-
-                    }catch (IOException e){
-                        e.getMessage();
-                    }
 
                     System.out.println("Ingrese el valor de desplazamiento: ");
                     int desp = teclado.nextInt();
@@ -81,6 +72,22 @@ public class Main {
 
 
     public static String cifrar(String texto, int desp) {
+String nombreArchivo = "Archivo.txt";
+        
+        try {
+            FileReader archivo = new FileReader(nombreArchivo);
+            BufferedReader lector = new BufferedReader(archivo);
+            
+            String linea;
+            while ((linea = lector.readLine()) != null) {
+                System.out.println(linea); // Imprimir cada línea leída
+            }
+            
+            lector.close(); // Cierra el BufferedReader al finalizar
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         StringBuilder resultado = new StringBuilder();
         for (int i = 0; i < texto.length(); i++) {
             char  caracter = texto.charAt(i);
