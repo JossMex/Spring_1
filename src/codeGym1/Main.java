@@ -1,25 +1,20 @@
 package codeGym1;
 
-import javax.swing.*;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+
+import java.io.*;
 import java.util.Scanner;
-import java.io.BufferedReader;
 
 public class Main {
     static Scanner teclado = new Scanner(System.in);
-    static String alfMin = "abcdefghijklmnopqrstuvwxyz";
-    static String alfMay = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws IOException{
 
         System.out.println("Sistema de para cifrar y descifrar un archivo");
         System.out.println("/*/*/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*");
         System.out.println();
 
         int opc1;
+
         do {
             System.out.println("Selecciona una opción: ");
             System.out.println("1. Cifrar ");
@@ -31,32 +26,13 @@ public class Main {
 
             switch (opc1) {
                 case 1:
-
-                    System.out.println("Ingrese el valor de desplazamiento: ");
-                    int desp = teclado.nextInt();
-
-                    String textoCifrado = cifrar(desp, texto);
-                    System.out.println("Texto cifrado: " + textoCifrado);
+                    cifrarArchivo();
                     break;
                 case 2:
-                    System.out.println("Ingrese el texto cifrado: ");
-                    textoCifrado = teclado.nextLine();
-
-                    System.out.println("Ingrese el valor de desplazamiento: ");
-                    int despl = teclado.nextInt();
-
-                    String textoDescifrado = descifrar(textoCifrado, despl);
-                    System.out.println("Texto descifrado: " + textoDescifrado);
+                    descifrarArchivo();
                     break;
                 case 3:
-                    textoCifrado = " Krod Pzqgr";
-                    System.out.println("texto cifrado: " + textoCifrado);
-                    System.out.println("Descifrado por fuerza bruta: ");
-
-                    for (int despla = 1; despla < 26; despla++){
-                        textoCifrado = fuerzaBruta(textoCifrado, despla);
-                        System.out.println("Desplazamiento " + despla + ":" + textoDescifrado);
-                    }
+                    fuerzaBruta();
                     break;
                 case 4:
                     estadistica();
@@ -70,62 +46,80 @@ public class Main {
         System.out.println("El programa ha finalizado");
     }
 
-
-    public static String cifrar(String texto, int desp) {
-String nombreArchivo = "Archivo.txt";
-        
+    public static void cifrarArchivo(){
         try {
-            FileReader archivo = new FileReader(nombreArchivo);
-            BufferedReader lector = new BufferedReader(archivo);
-            
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Ingrese el valor de desplazamiento");
+            int desplazamiento = scanner.nextInt();
+
+            File archivoEntrada = new File("Archivo.txt");
+            File archivosalida = new File("archivo_cifrado.txt");
+
+            FileReader fileReader = new FileReader(archivoEntrada);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            FileWriter fileWriter = new FileWriter(archivosalida);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
             String linea;
-            while ((linea = lector.readLine()) != null) {
-                System.out.println(linea); // Imprimir cada línea leída
+            while ((linea = bufferedReader.readLine()) != null) {
+                String lineaCifrada = cifrar(linea, desplazamiento);
+                bufferedWriter.write(lineaCifrada);
+                bufferedWriter.newLine();
             }
-            
-            lector.close(); // Cierra el BufferedReader al finalizar
-        } catch (IOException e) {
+            bufferedReader.close();
+            bufferedWriter.close();
+        }catch (IOException e){
             e.printStackTrace();
         }
+    }
 
-        StringBuilder resultado = new StringBuilder();
-        for (int i = 0; i < texto.length(); i++) {
-            char  caracter = texto.charAt(i);
-            if (Character.isLetter(caracter)){
-                char base = Character.isLowerCase(caracter) ? 'a' : 'A';
-                caracter = (char) (base + (caracter - base + desp) % 26);
+    public static void descifrarArchivo(){
+        try {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Ingrese el valor de desplazamiento utilizado para cifrar: ");
+            int desplazamiento = scanner.nextInt();
+
+            File archivoCifrado = new File("archivo_cifrado.txt");
+            File archivoDescifrado = new File("archivo_descifrado.txt");
+
+            FileReader fileReader = new FileReader(archivoCifrado);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            FileWriter fileWriter = new FileWriter(archivoDescifrado);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+            String linea;
+            while ((linea = bufferedReader.readLine()) != null){
+                String lineadescifrada = descifrar(linea, desplazamiento);
+                bufferedWriter.write(lineadescifrada);
+                bufferedWriter.newLine();
             }
-            resultado.append(caracter);
+            bufferedReader.close();
+            bufferedWriter.close();
+            System.out.println("Archivo descifrado exitosamente como archivo_descifrado.txt");
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+    public static String cifrar(String texto, int desplazamiento) {
+        StringBuilder resultado = new StringBuilder();
+        for (char caracter : texto.toCharArray()) {
+            if (Character.isLetter(caracter)) {
+                char base = Character.isLowerCase(caracter) ? 'a' : 'A';
+                resultado.append((char) (((caracter - base + desplazamiento) % 26 ) + base));
+            }else {
+                resultado.append(caracter);
+            }
         }
         return resultado.toString();
     }
+    public static String descifrar(String textoCifrado, int desplazamiento) {
 
-
-    public static String descifrar(String textoCifrado, int despl) {
-        StringBuilder resultado = new StringBuilder();
-        for (int i = 0; i < textoCifrado.length(); i++){
-            char caracter = textoCifrado.charAt(i);
-            if (Character.isLetter(caracter)){
-                char base = Character.isLowerCase(caracter) ? 'a' : 'A';
-                caracter = (char) (base + (caracter - base - despl + 26) % 26);
-            }
-            resultado.append(caracter);
-        }
-        return resultado.toString();
+        return cifrar(textoCifrado, -desplazamiento);
     }
 
-    public static String fuerzaBruta(String textoCifrado, int despla) {
-        StringBuilder resultado = new StringBuilder();
-        for (int i = 0; i < textoCifrado.length(); i++){
-            char caracter;
-            caracter = textoCifrado(i);
-            if ( Character.isLetter(caracter)){
-                char base = Character.isLowerCase(caracter) ? 'a' : 'A';
-                caracter = (char) (base + (caracter - base - despla + 26) % 26);
-            }
-            resultado.append(caracter);
-        }
-        return resultado.toString();
+    public static String fuerzaBruta() {
+
+        return null;
     }
 
     public static String estadistica() {
